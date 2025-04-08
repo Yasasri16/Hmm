@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>The Vow Vault 💖</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe4ec, #ffcad4);
+      font-family: 'Segoe UI', sans-serif;
+      color: #4b2c36;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #d63384;
+      font-size: 2.5em;
+    }
+    .form-container {
+      max-width: 600px;
+      margin: 20px auto;
+      background: #fff0f5;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      background-color: #ff6f91;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #e45775;
+    }
+    .vow-list {
+      max-width: 700px;
+      margin: 30px auto;
+    }
+    .vow {
+  position: relative;
+  background-color: #ffeeee;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  overflow: hidden;
+  padding-right: 90px; /* gives room for the delete button */
+}
+
+    .vow small {
+      display: block;
+      margin-top: 10px;
+      color: #6d214f;
+      font-size: 0.9em;
+    }
+    .vow-card {
+  position: relative;
+  background-color: #fff0f4;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(255, 192, 203, 0.3);
+}
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background-color: #ffccd5;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(255, 105, 135, 0.3);
+  transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+  background-color: #ff99aa;
+  transform: scale(1.1);
+}
+
+
+
+  </style>
+</head>
+<body>
+
+  <h1>💖 The Vow Vault 💖</h1>
+
+  <div class="form-container">
+    <input type="text" id="vowAuthor" placeholder="Your Name" />
+    <textarea id="vowText" rows="4" placeholder="Write your vow here..."></textarea>
+    <button onclick="addVow()">Save Vow 💌</button>
+  </div>
+
+  <div class="vow-list" id="vowList"></div>
+
+  <script>
+    function loadVows() {
+      const vows = JSON.parse(localStorage.getItem('vowVault') || '[]');
+      const vowList = document.getElementById('vowList');
+      vowList.innerHTML = '';
+      vows.forEach((vow, index) => {
+        const vowDiv = document.createElement('div');
+        vowDiv.className = 'vow';
+        vowDiv.innerHTML = `
+          <button class="delete-btn" onclick="deleteVow(${index})">💔</button>
+          <p>${vow.text}</p>
+          <small>💌 From: <strong>${vow.author}</strong> on ${vow.date}</small>
+        `;
+        vowList.appendChild(vowDiv);
+      });
+    }
+
+    function addVow() {
+      const text = document.getElementById('vowText').value.trim();
+      const author = document.getElementById('vowAuthor').value.trim();
+      if (!text || !author) return alert("Please enter both name and vow!");
+
+      const date = new Date().toLocaleString();
+      const newVow = { text, author, date };
+      const vows = JSON.parse(localStorage.getItem('vowVault') || '[]');
+      vows.push(newVow);
+      localStorage.setItem('vowVault', JSON.stringify(vows));
+      document.getElementById('vowText').value = '';
+      document.getElementById('vowAuthor').value = '';
+      loadVows();
+    }
+
+    function deleteVow(index) {
+      const vows = JSON.parse(localStorage.getItem('vowVault') || '[]');
+      vows.splice(index, 1);
+      localStorage.setItem('vowVault', JSON.stringify(vows));
+      loadVows();
+    }
+    loadVows();
+  </script>
+
+</body>
+</html>
