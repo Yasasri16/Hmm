@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>Trends & Games 💞</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe4ec, #ffcad4);
+      font-family: 'Helvetica Neue', sans-serif;
+      padding: 20px;
+      color: #4b2c36;
+    }
+    h1 {
+      text-align: center;
+      color: #d63384;
+      font-size: 1.8em;
+    }
+    .input-section {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    input {
+      padding: 8px;
+      font-size: 0.95em;
+      border-radius: 10px;
+      border: 1.5px solid #ff6f91;
+      width: 60%;
+    }
+    button {
+      margin-left: 8px;
+      padding: 8px 14px;
+      font-size: 0.9em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff6f91;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #e45775;
+    }
+    .section {
+      margin-top: 25px;
+    }
+    h2 {
+      color: #6d214f;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+  background: rgba(255, 255, 255, 0.7);
+  margin: 8px 0;
+  padding: 4px 5px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 8px rgba(255, 182, 193, 0.25);
+  font-size: 0.8em; 
+}
+
+    .actions button {
+      margin-left: 6px;
+      background-color: #c44569;
+      font-size: 0.85em;
+      padding: 6px 10px;
+    }
+    .actions .done {
+      background-color: #63cdda;
+    }
+  </style>
+</head>
+<body>
+  <h1>To Do Trends / Games</h1>
+
+  <div class="input-section">
+    <input type="text" id="trendInput" placeholder="Add a fun trend or game..." />
+    <button onclick="addTrend()">➕ Add</button>
+  </div>
+
+  <div class="section">
+    <h2>🌟 Upcoming</h2>
+    <ul id="upcomingList"></ul>
+  </div>
+
+  <div class="section">
+    <h2>💖 Completed</h2>
+    <ul id="completedList"></ul>
+  </div>
+
+  <script>
+    const upcomingList = document.getElementById('upcomingList');
+    const completedList = document.getElementById('completedList');
+    const input = document.getElementById('trendInput');
+
+    function saveToStorage() {
+      const data = {
+        upcoming: Array.from(upcomingList.children).map(li => li.querySelector('span').textContent),
+        completed: Array.from(completedList.children).map(li => li.querySelector('span').textContent),
+      };
+      localStorage.setItem('trendsData', JSON.stringify(data));
+    }
+
+    function loadFromStorage() {
+      const data = JSON.parse(localStorage.getItem('trendsData'));
+      if (data) {
+        data.upcoming.forEach(text => createTrendItem(text, false));
+        data.completed.forEach(text => createTrendItem(text, true));
+      }
+    }
+
+    function createTrendItem(text, completed) {
+      const li = document.createElement('li');
+      const span = document.createElement('span');
+      span.textContent = text;
+      li.appendChild(span);
+
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+
+      if (!completed) {
+        const doneBtn = document.createElement('button');
+        doneBtn.textContent = '✅ Done';
+        doneBtn.className = 'done';
+        doneBtn.onclick = () => {
+          completedList.appendChild(li);
+          doneBtn.remove();
+          saveToStorage();
+        };
+        actions.appendChild(doneBtn);
+      }
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '🗑️ Delete';
+      deleteBtn.onclick = () => {
+        li.remove();
+        saveToStorage();
+      };
+
+      actions.appendChild(deleteBtn);
+      li.appendChild(actions);
+
+      if (completed) {
+        completedList.appendChild(li);
+      } else {
+        upcomingList.appendChild(li);
+      }
+
+      saveToStorage();
+    }
+
+    function addTrend() {
+      const text = input.value.trim();
+      if (text !== '') {
+        createTrendItem(text, false);
+        input.value = '';
+      }
+    }
+
+    loadFromStorage();
+  </script>
+</body>
+</html>
