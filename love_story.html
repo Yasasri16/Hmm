@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>Our Story 💖</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe4ec, #ffcad4);
+      font-family: 'Segoe UI', sans-serif;
+      color: #4b2c36;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3em;
+      color: #d63384;
+      margin-bottom: 0.5em;
+    }
+
+    .story-form {
+      max-width: 600px;
+      margin: 0 auto 30px;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(255, 182, 193, 0.3);
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1em;
+      font-family: inherit;
+    }
+
+    button {
+  background-color: #ff6f91;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-family: inherit;
+  width: auto;
+  display: inline-block;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+}
+
+
+    button:hover {
+      background-color: #e45775;
+    }
+
+    .story-list {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .story-entry {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 6px 12px rgba(255, 182, 193, 0.2);
+      animation: fadeInUp 0.6s ease-out;
+      position: relative;
+    }
+
+    .story-entry h3 {
+      margin-top: 0;
+      color: #d63384;
+    }
+
+    .story-entry p {
+      margin: 10px 0;
+    }
+
+    .story-entry small {
+      display: block;
+      margin-top: 10px;
+      color: #888;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: #ff6b81;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .delete-btn:hover {
+      background-color: #d63350;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0.95);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .heart {
+      position: absolute;
+      font-size: 24px;
+      color: #ff6f91;
+      animation: floatUp 1.5s ease-out forwards;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    @keyframes floatUp {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-80px) scale(1.5);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Our Love Story 💌</h1>
+
+  <div class="story-form">
+    <input type="text" id="storyTitle" placeholder="Chapter Title " />
+    <textarea id="storyContent" rows="5" placeholder="Write your story..."></textarea>
+    <button onclick="addStory()">Add Chapter</button>
+  </div>
+
+  <div class="story-list" id="storyList"></div>
+
+  <script>
+    function getStories() {
+      return JSON.parse(localStorage.getItem("loveStories")) || [];
+    }
+
+    function saveStories(stories) {
+      localStorage.setItem("loveStories", JSON.stringify(stories));
+    }
+
+    function renderStories() {
+      const stories = getStories();
+      const storyList = document.getElementById("storyList");
+      storyList.innerHTML = "";
+
+      stories.forEach((story, index) => {
+        const div = document.createElement("div");
+        div.className = "story-entry";
+        div.innerHTML = `
+          <h3>${story.title}</h3>
+          <p>${story.content}</p>
+          <small>🕰️ ${story.date}</small>
+          <button class="delete-btn" onclick="deleteStory(${index})">✕</button>
+        `;
+        storyList.appendChild(div);
+      });
+    }
+
+    function addStory() {
+      const title = document.getElementById("storyTitle").value.trim();
+      const content = document.getElementById("storyContent").value.trim();
+
+      if (!title || !content) return alert("Please write something!");
+
+      const newStory = {
+        title,
+        content,
+        date: new Date().toLocaleString()
+      };
+
+      const stories = getStories();
+      stories.unshift(newStory);
+      saveStories(stories);
+      renderStories();
+
+      document.getElementById("storyTitle").value = "";
+      document.getElementById("storyContent").value = "";
+
+      // 💖 heart float animation
+      const heart = document.createElement("div");
+      heart.textContent = "💖";
+      heart.className = "heart";
+      heart.style.left = Math.random() * 80 + 10 + "%";
+      heart.style.top = "60%";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1500);
+    }
+
+    function deleteStory(index) {
+      const stories = getStories();
+      stories.splice(index, 1);
+      saveStories(stories);
+      renderStories();
+    }
+
+    renderStories();
+  </script>
+</body>
+</html>
