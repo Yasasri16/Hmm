@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>Previous Fights 😅</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe4ec, #ffcad4);
+      font-family: 'Helvetica Neue', sans-serif;
+      padding: 20px;
+      color: #4b2c36;
+    }
+    h1 {
+      color: #d63384;
+      text-align: center;
+    }
+    .input-section {
+      max-width: 500px;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.7);
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+    }
+    input, select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 16px;
+      font-size: 1em;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff6f91;
+      color: white;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+    button:hover {
+      background-color: #e45775;
+    }
+    .fight-list, .resolved-list {
+      max-width: 700px;
+      margin: 20px auto;
+    }
+    .fight-item {
+      background: rgba(255,255,255,0.8);
+      border-radius: 12px;
+      padding: 10px 15px;
+      margin: 10px 0;
+      font-size: 0.9em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(255, 182, 193, 0.2);
+    }
+    .fight-details {
+      flex: 1;
+    }
+    .fight-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .resolved-list h2 {
+      text-align: center;
+      color: #6d214f;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Previous Fights 😅</h1>
+
+  <div class="input-section">
+    <input type="text" id="reason" placeholder="What was the fight about? 😅" />
+    <select id="starter">
+      <option value="Your Highness 👑">Most Beautiful Girl 👑</option>
+      <option value="Servant 🙇‍♂️">Her Favourite Boy</option>
+    </select>
+    <input type="date" id="fightDate" />
+    <button onclick="addFight()">Add Fight</button>
+  </div>
+
+  <div class="fight-list" id="fightList"></div>
+
+  <div class="resolved-list">
+    <h2>Resolved Fights 💖</h2>
+    <div id="resolvedList"></div>
+  </div>
+
+  <script>
+    let unresolvedFights = [];
+    let resolvedFights = [];
+  
+    function saveToLocalStorage() {
+      localStorage.setItem('unresolvedFights', JSON.stringify(unresolvedFights));
+      localStorage.setItem('resolvedFights', JSON.stringify(resolvedFights));
+    }
+  
+    function loadFromLocalStorage() {
+      const unresolved = JSON.parse(localStorage.getItem('unresolvedFights')) || [];
+      const resolved = JSON.parse(localStorage.getItem('resolvedFights')) || [];
+  
+      unresolvedFights = unresolved;
+      resolvedFights = resolved;
+  
+      unresolved.forEach(fight => {
+        const item = createFightElement(fight.reason, fight.starter, fight.date, false);
+        document.getElementById('fightList').appendChild(item);
+      });
+  
+      resolved.forEach(fight => {
+        const item = createFightElement(fight.reason, fight.starter, fight.date, true);
+        document.getElementById('resolvedList').appendChild(item);
+      });
+    }
+  
+    function createFightElement(reason, starter, date, isResolved = false) {
+      const item = document.createElement('div');
+      item.className = 'fight-item';
+  
+      const details = document.createElement('div');
+      details.className = 'fight-details';
+      details.innerHTML = `<strong>Reason:</strong> ${reason}<br><strong>Started by:</strong> ${starter}<br><strong>Date:</strong> ${date || 'N/A'}`;
+  
+      const actions = document.createElement('div');
+      actions.className = 'fight-actions';
+  
+      if (!isResolved) {
+        const resolveBtn = document.createElement('button');
+        resolveBtn.textContent = 'Resolved 💖';
+        resolveBtn.onclick = () => {
+          const fightIndex = unresolvedFights.findIndex(f => f.reason === reason && f.starter === starter && f.date === date);
+          if (fightIndex !== -1) {
+            const resolvedFight = unresolvedFights.splice(fightIndex, 1)[0];
+            resolvedFights.push(resolvedFight);
+            saveToLocalStorage();
+          }
+  
+          const resolvedItem = createFightElement(reason, starter, date, true);
+          document.getElementById('resolvedList').appendChild(resolvedItem);
+          item.remove();
+        };
+        actions.appendChild(resolveBtn);
+      }
+  
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = 'Delete 🗑️';
+      deleteBtn.onclick = () => {
+        if (isResolved) {
+          resolvedFights = resolvedFights.filter(f => !(f.reason === reason && f.starter === starter && f.date === date));
+        } else {
+          unresolvedFights = unresolvedFights.filter(f => !(f.reason === reason && f.starter === starter && f.date === date));
+        }
+        saveToLocalStorage();
+        item.remove();
+      };
+      actions.appendChild(deleteBtn);
+  
+      item.appendChild(details);
+      item.appendChild(actions);
+      return item;
+    }
+  
+    function addFight() {
+      const reason = document.getElementById('reason').value.trim();
+      const starter = document.getElementById('starter').value;
+      const date = document.getElementById('fightDate').value;
+  
+      if (reason === '') {
+        alert("Please enter the reason for the fight!");
+        return;
+      }
+  
+      const fightData = { reason, starter, date };
+      unresolvedFights.push(fightData);
+      saveToLocalStorage();
+  
+      const item = createFightElement(reason, starter, date, false);
+      document.getElementById('fightList').appendChild(item);
+  
+      document.getElementById('reason').value = '';
+      document.getElementById('starter').selectedIndex = 0;
+      document.getElementById('fightDate').value = '';
+    }
+  
+    // Load saved fights when page opens
+    window.onload = loadFromLocalStorage;
+  </script>
+    
+
+</body>
+</html>
