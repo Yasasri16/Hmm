@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="responsive.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📸 Photo Gallery</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #ffe4ec, #ffcad4);
+      font-family: 'Helvetica Neue', sans-serif;
+      color: #4b2c36;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #d63384;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      margin: 20px 0;
+    }
+
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    .photo-card {
+      position: relative;
+      display: inline-block;
+    }
+
+    .photo-card img {
+      max-width: 200px;
+      border-radius: 15px;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .photo-card img:hover {
+      transform: scale(1.05);
+    }
+
+    .delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background-color: rgba(255, 182, 193, 0.9); /* soft pink */
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #ff6b81;
+  transform: scale(1.1);
+}
+
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .lightbox img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📸 Our Sweet Memories</h1>
+  <input type="file" accept="image/*" id="photoInput" multiple />
+  <div class="gallery" id="gallery"></div>
+
+  <div class="lightbox" id="lightbox">
+    <img id="lightbox-img" src="" alt="Full Size" />
+  </div>
+
+  <script>
+    const input = document.getElementById('photoInput');
+    const gallery = document.getElementById('gallery');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    function loadPhotos() {
+      const storedPhotos = JSON.parse(localStorage.getItem('photoGallery') || '[]');
+      storedPhotos.forEach((src) => addPhotoToGallery(src));
+    }
+
+    function addPhotoToGallery(src) {
+      const card = document.createElement('div');
+      card.className = 'photo-card';
+
+      const img = document.createElement('img');
+      img.src = src;
+      img.onclick = () => {
+        lightboxImg.src = src;
+        lightbox.style.display = 'flex';
+      };
+
+      const btn = document.createElement('button');
+      btn.textContent = '🗑️';
+      btn.className = 'delete-btn';
+      btn.onclick = () => deletePhoto(src, card);
+
+      card.appendChild(img);
+      card.appendChild(btn);
+      gallery.appendChild(card);
+    }
+
+    function deletePhoto(src, cardElement) {
+      let currentPhotos = JSON.parse(localStorage.getItem('photoGallery') || '[]');
+      currentPhotos = currentPhotos.filter(photo => photo !== src);
+      localStorage.setItem('photoGallery', JSON.stringify(currentPhotos));
+      cardElement.remove();
+    }
+
+    input.addEventListener('change', function () {
+      const files = Array.from(this.files);
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const src = e.target.result;
+          addPhotoToGallery(src);
+
+          const currentPhotos = JSON.parse(localStorage.getItem('photoGallery') || '[]');
+          currentPhotos.push(src);
+          localStorage.setItem('photoGallery', JSON.stringify(currentPhotos));
+        };
+        reader.readAsDataURL(file);
+      });
+    });
+
+    lightbox.onclick = () => {
+      lightbox.style.display = 'none';
+    };
+
+    window.onload = loadPhotos;
+  </script>
+</body>
+</html>
