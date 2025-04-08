@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>🌙 Date Night Ideas</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom right, #fddde6, #ffd6f0);
+      font-family: 'Segoe UI', sans-serif;
+      color: #4b2c36;
+      margin: 0;
+      padding: 30px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.75);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(255, 182, 193, 0.4);
+    }
+    h1 {
+      text-align: center;
+      font-size: 2.8em;
+      color: #d63384;
+      margin-bottom: 30px;
+    }
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    li {
+      background-color: #ffe9f2;
+      margin-bottom: 10px;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(255, 105, 135, 0.1);
+      font-size: 1.1em;
+    }
+    li::before {
+      content: "🌸 ";
+    }
+    .input-area {
+      margin-top: 40px;
+      text-align: center;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 70%;
+      border-radius: 10px;
+      border: 1px solid #d63384;
+      font-size: 1em;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #d63384;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1em;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #b83260;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌙 Date Night Ideas</h1>
+
+    <ul id="ideasList"></ul>
+
+    <div class="input-area">
+      <input type="text" id="newIdeaInput" placeholder="Type your date night idea..." />
+      <button onclick="addIdea()">Add</button>
+    </div>
+  </div>
+  <script>
+    const ideasList = document.getElementById('ideasList');
+    const input = document.getElementById('newIdeaInput');
+  
+    // Load saved ideas
+    window.onload = () => {
+      const saved = JSON.parse(localStorage.getItem('dateNightIdeas')) || [];
+      saved.forEach(idea => addIdeaToList(idea));
+    };
+  
+    function addIdea() {
+      const idea = input.value.trim();
+      if (idea === "") return;
+      addIdeaToList(idea);
+      saveIdea(idea);
+      input.value = "";
+    }
+  
+    function addIdeaToList(idea) {
+      const li = document.createElement('li');
+      li.textContent = idea;
+  
+      const delBtn = document.createElement('button');
+      delBtn.textContent = "❌";
+      delBtn.style.marginLeft = "15px";
+      delBtn.style.backgroundColor = "#ffc0cb";
+      delBtn.style.border = "none";
+      delBtn.style.borderRadius = "8px";
+      delBtn.style.cursor = "pointer";
+      delBtn.style.padding = "4px 8px";
+      delBtn.onclick = () => {
+        li.remove();
+        removeIdea(idea);
+      };
+  
+      li.appendChild(delBtn);
+      ideasList.appendChild(li);
+    }
+  
+    function saveIdea(idea) {
+      const saved = JSON.parse(localStorage.getItem('dateNightIdeas')) || [];
+      saved.push(idea);
+      localStorage.setItem('dateNightIdeas', JSON.stringify(saved));
+    }
+  
+    function removeIdea(ideaToRemove) {
+      let saved = JSON.parse(localStorage.getItem('dateNightIdeas')) || [];
+      saved = saved.filter(idea => idea !== ideaToRemove);
+      localStorage.setItem('dateNightIdeas', JSON.stringify(saved));
+    }
+  </script>
+  
+</body>
+</html>
