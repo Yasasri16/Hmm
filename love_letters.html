@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="responsive.css">
+
+  <title>Love Letters 💌</title>
+  <style>
+    body {
+      background: radial-gradient(circle, #ffe4f0, #fbd0e0);
+      font-family: 'Georgia', serif;
+      padding: 20px;
+      color: #5a2a38;
+    }
+
+    h1 {
+      text-align: center;
+      color: #c2185b;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+
+    .letter-form {
+      max-width: 700px;
+      margin: 0 auto 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #fff0f5;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 10px #e2a9b0;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #d63384;
+      font-size: 1em;
+    }
+
+    textarea {
+      resize: vertical;
+      height: 120px;
+    }
+
+    button {
+      align-self: flex-end;
+      background-color: #ff6f91;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e45775;
+    }
+
+    .letters-container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .letter {
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 15px 20px;
+      margin: 15px 0;
+      box-shadow: 0 4px 8px rgba(255, 105, 135, 0.2);
+      position: relative;
+    }
+
+    .letter h3 {
+      margin: 0;
+      color: #b03060;
+    }
+
+    .letter p {
+      margin-top: 10px;
+      white-space: pre-line;
+    }
+
+    .timestamp {
+      font-size: 0.8em;
+      color: #888;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #f08080;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 0.9em;
+      color: white;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background-color: #cd5c5c;
+    }
+  </style>
+</head>
+<body>
+  <h1>Love Letters 💌</h1>
+
+  <div class="letter-form">
+    <input type="text" id="letterTitle" placeholder="Write your Name" />
+    <textarea id="letterBody" placeholder="Write your love letter here..."></textarea>
+    <button onclick="addLetter()">Send 💖</button>
+  </div>
+
+  <div class="letters-container" id="lettersContainer"></div>
+
+  <script>
+    const titleInput = document.getElementById('letterTitle');
+    const bodyInput = document.getElementById('letterBody');
+    const container = document.getElementById('lettersContainer');
+
+    function getFormattedDateTime() {
+      const now = new Date();
+      return now.toLocaleString('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    function saveLetters() {
+      localStorage.setItem('loveLetters', container.innerHTML);
+    }
+
+    function loadLetters() {
+      container.innerHTML = localStorage.getItem('loveLetters') || '';
+    }
+
+    function addLetter() {
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+      if (!title || !body) return;
+
+      const timestamp = getFormattedDateTime();
+
+      const letter = document.createElement('div');
+      letter.className = 'letter';
+      letter.innerHTML = `
+        <h3>${title}</h3>
+        <p>${body}</p>
+        <div class="timestamp">Written on: ${timestamp}</div>
+        <button class="delete-btn" onclick="deleteLetter(this)">Delete</button>
+      `;
+
+      container.prepend(letter);
+      titleInput.value = '';
+      bodyInput.value = '';
+      saveLetters();
+    }
+
+    function deleteLetter(btn) {
+      btn.parentElement.remove();
+      saveLetters();
+    }
+
+    loadLetters();
+  </script>
+</body>
+</html>
